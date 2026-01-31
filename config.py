@@ -78,7 +78,10 @@ def close_ssh_tunnel():
         print("SSH tunnel closed")
 
 
-create_ssh_tunnel()
-# atexit не используем: иначе при debug/reloader при перезапуске процесса
-# видно "SSH tunnel closed". Туннель живёт до выхода процесса.
+# Туннель НЕ создаётся при импорте: под Gunicorn его создаёт только master
+# в gunicorn_conf.py (on_starting), чтобы несколько воркеров не пытались
+# занять один и тот же local_bind_port. Для запуска без Gunicorn (Flask
+# debug) вызовите create_ssh_tunnel() перед первым обращением к БД или
+# раскомментируйте строку ниже:
+# create_ssh_tunnel()
 

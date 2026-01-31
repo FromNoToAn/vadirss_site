@@ -1,3 +1,4 @@
+import os
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -259,6 +260,9 @@ def static_files(path):
     return send_from_directory('site', path)
 
 if __name__ == '__main__':
+    from config import create_ssh_tunnel
+    if os.environ.get('SSH_HOST'):
+        create_ssh_tunnel()
     try:
         app.run(debug=True)
     except (KeyboardInterrupt, SystemExit):
