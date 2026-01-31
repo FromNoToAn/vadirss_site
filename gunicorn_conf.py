@@ -7,7 +7,7 @@ import os
 
 # Приложение
 wsgi_app = "backend:app"
-bind = "0.0.0.0:8000"
+bind = os.getenv("GUNICORN_BIND", "127.0.0.1:5000")  # за Nginx — localhost:5000
 workers = int(os.getenv("GUNICORN_WORKERS", "2"))
 worker_class = "sync"
 timeout = 120
