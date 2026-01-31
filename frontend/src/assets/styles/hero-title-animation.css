@@ -1,0 +1,10 @@
+/* Титульник «Цифровой сервис для вашей команды»: анимация при появлении */
+
+.hero-title {
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
+}
+
+.hero-title.hero-title_in-view {
+  opacity: 1;
+}

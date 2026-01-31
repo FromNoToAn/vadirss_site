@@ -1,0 +1,35 @@
+/* Аккордеон FAQ: минус при открытом, плюс при закрытом, плавное открытие/закрытие */
+
+.s-faq-type-3 {
+  --faq-duration: 0.35s;
+  --faq-ease: ease-out;
+}
+
+.s-faq-type-3__question::after {
+  transition: opacity var(--faq-duration) var(--faq-ease);
+}
+
+.s-faq-type-3__question_open.s-faq-type-3__question::after {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.s-faq-type-3__question:not(.s-faq-type-3__question_open)::after {
+  opacity: 1;
+}
+
+.s-faq-type-3__answer {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--faq-duration) var(--faq-ease);
+  height: auto;
+  min-height: 0;
+}
+
+.s-faq-type-3__answer.faq-answer_open {
+  grid-template-rows: 1fr;
+}
+
+.s-faq-type-3__answer-inner {
+  overflow: hidden;
+}

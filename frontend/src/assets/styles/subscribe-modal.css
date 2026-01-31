@@ -1,0 +1,181 @@
+/* Модальное окно оформления подписки (форма + оплата Т-Банк) */
+
+.subscribe-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 1rem;
+  box-sizing: border-box;
+  overflow: hidden;
+  overscroll-behavior: contain;
+}
+
+.subscribe-modal {
+  background: #121212;
+  color: #fff;
+  border: 3px solid var(--subscribe-accent, #009EDC);
+  border-radius: 24px;
+  padding: 1.5rem;
+  max-width: 520px;
+  width: 100%;
+  max-height: 90vh;
+  overflow: hidden;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  overscroll-behavior: contain;
+}
+
+.subscribe-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.subscribe-modal-close {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0 0.5rem;
+  line-height: 1;
+  transition: color 0.2s;
+}
+
+.subscribe-modal-close:hover {
+  color: var(--subscribe-accent, #009EDC);
+}
+
+.subscribe-type-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.subscribe-type-btn {
+  flex: 1;
+  padding: 0.6rem 1rem;
+  border-radius: 50px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.subscribe-type-btn:hover {
+  border-color: var(--subscribe-accent, #009EDC);
+}
+
+.subscribe-type-btn.active {
+  border-color: var(--subscribe-accent, #009EDC);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.subscribe-form-block {
+  margin-bottom: 1rem;
+}
+
+.subscribe-form-block h4 {
+  margin: 0 0 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.subscribe-form-block input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.75rem 1rem;
+  border-radius: 50px;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  font-size: 1rem;
+}
+
+.subscribe-form-block input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.subscribe-form-block input:focus {
+  outline: none;
+  border-color: var(--subscribe-accent, #009EDC);
+}
+
+.subscribe-tariff-badge {
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--subscribe-accent, #009EDC);
+  font-weight: 500;
+  text-align: center;
+}
+
+.subscribe-pay-btn {
+  display: block;
+  width: 100%;
+  margin-top: 1.25rem;
+  padding: 0.9rem 1.5rem;
+  border-radius: 50px;
+  border: 2px solid var(--subscribe-accent, #009EDC);
+  background: transparent;
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+  text-align: center;
+  transition: background 0.2s, color 0.2s;
+}
+
+.subscribe-pay-btn:hover {
+  background: var(--subscribe-accent, #009EDC);
+  color: #111;
+}
+
+.subscribe-pay-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.subscribe-payment-wrap {
+  display: flex;
+  flex-direction: column;
+}
+
+.subscribe-payment-container {
+  min-height: 420px;
+  position: relative;
+}
+
+.subscribe-payment-container iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  border-radius: 8px;
+  display: block;
+}
+
+.subscribe-payment-loading,
+.subscribe-payment-hint {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 1rem 0;
+  font-size: 0.95rem;
+}
+
+.subscribe-payment-error {
+  text-align: center;
+  color: #e57373;
+  margin: 1rem 0;
+}

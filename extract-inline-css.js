@@ -1,0 +1,10 @@
+const fs = require('fs');
+const path = require('path');
+const html = fs.readFileSync(path.join(__dirname, 'frontend_assets', 'index.html'), 'utf8');
+const re = /<style id="inline-css">([\s\S]*?)<\/style>/;
+const m = html.match(re);
+if (!m) throw new Error('inline-css not found');
+const out = path.join(__dirname, 'frontend_assets', 'assets', 'styles', 'inline-base.css');
+fs.mkdirSync(path.dirname(out), { recursive: true });
+fs.writeFileSync(out, m[1]);
+console.log('Written', out);

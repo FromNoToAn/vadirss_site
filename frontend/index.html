@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- CSP: T-Bank (подключение_iframe) + ws localhost (расширения/DevTools). -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://integrationjs.tbank.ru https://*.tbank.ru https://*.tinkoff.ru https://*.tcsbank.ru https://*.t-static.ru; connect-src 'self' https://*.tinkoff.ru https://*.tcsbank.ru https://*.tbank.ru https://*.nspk.ru https://*.t-static.ru https://securepayments-nca.tinkoff.ru:6443 https://api-qa.diginetica.net https://smartcaptcha.cloud.yandex.ru https://mc.yandex.ru https://id.tbank.ru ws://localhost:* wss://localhost:* ws://127.0.0.1:* wss://127.0.0.1:*; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com https://*.tbank.ru https://*.tinkoff.ru https://*.t-static.ru; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; frame-src https://*.tbank.ru https://*.tinkoff.ru" />
+    <title>sport.vadirss.ru — Цифровой сервис для команды</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans&family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet" />
+  </head>
+  <body class="sb-body sb-body_with-footer ubuntu__title open-sans-regular sb-content-size_m sb-buttons-border_round">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

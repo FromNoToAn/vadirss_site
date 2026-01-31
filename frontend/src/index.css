@@ -1,0 +1,27 @@
+/* Базовые и блоковые стили (порядок важен) */
+@import './assets/styles/inline-base.css';
+@import './assets/styles/styles-element.css';
+@import './assets/styles/styles-layout.css';
+@import './assets/styles/styles-lazy.css';
+@import './assets/styles/size-m.css';
+@import './assets/styles/button-arrow.css';
+@import './assets/styles/main-type-11.css';
+@import './assets/styles/hero-title-animation.css';
+@import './assets/styles/steps-type-1.css';
+@import './assets/styles/running-line-type-1.css';
+@import './assets/styles/steps-type-2.css';
+@import './assets/styles/call-to-action-type-1.css';
+@import './assets/styles/gallery-type-11.css';
+@import './assets/styles/main-type-7.css';
+@import './assets/styles/gallery-type-4.css';
+@import './assets/styles/reviews-type-3.css';
+@import './assets/styles/advantages-blocks-type-5.css';
+@import './assets/styles/tariffs-card-type-1.css';
+@import './assets/styles/tariffs-carousel-overrides.css';
+@import './assets/styles/faq-type-3.css';
+@import './assets/styles/faq-accordion-overrides.css';
+@import './assets/styles/company-card-type-2.css';
+@import './assets/styles/footer-customer-type-5.css';
+@import './assets/styles/header-socials-type-2.css';
+@import './assets/styles/popups.css';
+@import './assets/styles/styles-helpers.css';

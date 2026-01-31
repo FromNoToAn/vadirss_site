@@ -1,0 +1,21 @@
+/* Карусель тарифов: контейнер с горизонтальным скроллом, карточки не сжимаются */
+
+.s-tariffs-card-type-1-containers {
+  overflow: hidden;
+}
+
+@media screen and (min-width: 640px) {
+  .s-tariffs-card-type-1__cards-container {
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+    /* Минимальная ширина карточки — контейнер скроллится, когда не помещается */
+    grid-auto-columns: minmax(280px, 1fr);
+  }
+
+  .s-tariffs-card-type-1__item {
+    scroll-snap-align: center;
+  }
+}
