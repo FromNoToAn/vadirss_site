@@ -1,4 +1,14 @@
 import os
+
+# Локально (python backend.py): туннель поднимаем до импорта db, иначе db.models
+# при загрузке подключается к 127.0.0.1:3307 и падает. На проде туннель — в gunicorn_conf.
+if __name__ == "__main__":
+    from dotenv import load_dotenv
+    load_dotenv()
+    if os.environ.get("SSH_HOST"):
+        from config import create_ssh_tunnel
+        create_ssh_tunnel()
+
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -7,6 +17,7 @@ from config import TBANK_BASE_URL, TBANK_TERMINAL_KEY
 from db.requests import (
     delete_old_users,
     delete_pending_payment,
+    format_phone,
     get_amount_for_level,
     get_pending_by_order_id,
     get_subscription_by_level,
@@ -71,9 +82,13 @@ def tbank_init():
         return jsonify({"error": str(e)}), 400
 
     if subscription_type == "individual":
-        phone_number = data.get("phone_number")
-        if not phone_number:
-            return jsonify({"error": "Phone number required"}), 400
+        raw_phone = (data.get("phone_number") or "").strip()
+        if not raw_phone:
+            return jsonify({"error": "Введите номер телефона"}), 400
+        try:
+            phone_number = format_phone(raw_phone)
+        except ValueError as e:
+            return jsonify({"error": str(e)}), 400
         team_word = None
     else:
         team_word = (data.get("team_word") or "").strip()
@@ -81,24 +96,14 @@ def tbank_init():
             return jsonify({"error": "Team word required"}), 400
         phone_number = None
 
-    try:
-        order_id = generate_order_id()
-        save_pending_payment(
-            order_id=order_id,
-            subscription_type=subscription_type,
-            subscription_level=subscription_level,
-            phone_number=phone_number,
-            team_word=team_word,
-        )
-    except Exception as e:
-        return jsonify({"error": "Failed to save pending payment"}), 500
-
+    order_id = generate_order_id()
     description = f"Подписка {subscription_level} ({subscription_type})"
     data_payload = {"Phone": phone_number} if phone_number else None
     notification_url = _tbank_url("/api/tbank/notification")
     success_url = _tbank_url("/payment/success")
     fail_url = _tbank_url("/payment/fail")
 
+    # Сначала вызываем API банка; в БД пишем только при успехе
     try:
         res = init_payment(
             order_id=order_id,
@@ -111,7 +116,22 @@ def tbank_init():
         )
     except Exception as e:
         app.logger.exception("T-Bank Init failed: %s", e)
-        return jsonify({"error": "T-Bank Init failed", "detail": str(e)}), 502
+        return jsonify({
+            "error": "Сервис оплаты временно недоступен. Попробуйте позже.",
+            "code": "bank_unavailable",
+        }), 503
+
+    try:
+        save_pending_payment(
+            order_id=order_id,
+            subscription_type=subscription_type,
+            subscription_level=subscription_level,
+            phone_number=phone_number,
+            team_word=team_word,
+        )
+    except Exception as e:
+        app.logger.exception("Failed to save pending payment: %s", e)
+        return jsonify({"error": "Ошибка сохранения заказа. Попробуйте ещё раз."}), 500
 
     return jsonify({"PaymentURL": res["PaymentURL"]}), 200
 
@@ -163,6 +183,8 @@ def tbank_notification():
 
     order_id = data.get("OrderId")
     status = data.get("Status")
+    
+    print(order_id, status)
 
     if status != "CONFIRMED":
         return "", 200
@@ -189,26 +211,26 @@ def tbank_notification():
     return "", 200
 
 
-@app.route("/payment/success")
-def payment_success():
-    return (
-        "<!DOCTYPE html><html><head><meta charset='utf-8'><title>Оплата</title></head>"
-        "<body><p>Оплата прошла успешно. Подписка активирована.</p>"
-        "<a href='/'>Вернуться на главную</a></body></html>",
-        200,
-        {"Content-Type": "text/html; charset=utf-8"},
-    )
+# @app.route("/payment/success")
+# def payment_success():
+#     return (
+#         "<!DOCTYPE html><html><head><meta charset='utf-8'><title>Оплата</title></head>"
+#         "<body><p>Оплата прошла успешно. Подписка активирована.</p>"
+#         "<a href='/'>Вернуться на главную</a></body></html>",
+#         200,
+#         {"Content-Type": "text/html; charset=utf-8"},
+#     )
 
 
-@app.route("/payment/fail")
-def payment_fail():
-    return (
-        "<!DOCTYPE html><html><head><meta charset='utf-8'><title>Оплата</title></head>"
-        "<body><p>Оплата не выполнена. Попробуйте снова.</p>"
-        "<a href='/'>Вернуться на главную</a></body></html>",
-        200,
-        {"Content-Type": "text/html; charset=utf-8"},
-    )
+# @app.route("/payment/fail")
+# def payment_fail():
+#     return (
+#         "<!DOCTYPE html><html><head><meta charset='utf-8'><title>Оплата</title></head>"
+#         "<body><p>Оплата не выполнена. Попробуйте снова.</p>"
+#         "<a href='/'>Вернуться на главную</a></body></html>",
+#         200,
+#         {"Content-Type": "text/html; charset=utf-8"},
+#     )
 
 
 @app.route('/pay_subscription', methods=['POST'])
@@ -245,11 +267,13 @@ def pay_subscription():
 
 @app.route('/get_user/<phone_number>', methods=['GET'])
 def get_user(phone_number):
-    user = get_user_by_phone(phone_number)
+    try:
+        user = get_user_by_phone(phone_number)
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
     if user:
         return jsonify({'phone_number': user.phone_number, 'subscription_level': user.subscription_level}), 200
-    else:
-        return jsonify({'error': 'User not found'}), 404
+    return jsonify({'error': 'User not found'}), 404
 
 @app.route('/')
 def index():
@@ -260,9 +284,6 @@ def static_files(path):
     return send_from_directory('site', path)
 
 if __name__ == '__main__':
-    from config import create_ssh_tunnel
-    if os.environ.get('SSH_HOST'):
-        create_ssh_tunnel()
     try:
         app.run(debug=True)
     except (KeyboardInterrupt, SystemExit):

@@ -54,12 +54,12 @@ def init_payment(
         "OrderId": order_id,
         "Description": description,
     }
-    if notification_url:
-        payload["NotificationURL"] = notification_url
-    if success_url:
-        payload["SuccessURL"] = success_url
-    if fail_url:
-        payload["FailURL"] = fail_url
+    # if notification_url:
+    #     payload["NotificationURL"] = notification_url
+    # if success_url:
+    #     payload["SuccessURL"] = success_url
+    # if fail_url:
+    #     payload["FailURL"] = fail_url
     if data:
         payload["DATA"] = data
 

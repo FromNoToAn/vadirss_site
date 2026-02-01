@@ -138,7 +138,8 @@ export function SubscribeModal({ open, onClose, tariff }: Props) {
 
       if (!initRes.ok) {
         setPaymentPhase('error');
-        setPaymentError(initData.detail || initData.error || `Ошибка ${initRes.status}`);
+        const msg = initData.error || initData.detail || `Ошибка ${initRes.status}`;
+        setPaymentError(msg);
         return;
       }
 

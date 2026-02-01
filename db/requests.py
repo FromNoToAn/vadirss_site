@@ -5,13 +5,15 @@ import random
 import string
 
 def format_phone(phone: str) -> str:
+    """Нормализует номер к виду: 7 и 10 цифр (всего 11 цифр), без скобок и плюса."""
     digits = ''.join(filter(str.isdigit, phone))
     if len(digits) == 10:
-        return '+7' + digits
-    elif len(digits) == 11 and digits.startswith('7'):
-        return '+7' + digits[1:]
-    else:
-        raise ValueError("Неверный формат номера телефона. Должен быть 10 цифр или 11 цифр начиная с 7.")
+        return '7' + digits
+    if len(digits) == 11 and digits.startswith('7'):
+        return digits
+    if len(digits) == 11 and digits.startswith('8'):
+        return '7' + digits[1:]
+    raise ValueError("Неверный формат номера. Введите 10 цифр или 11 цифр (начиная с 7 или 8).")
 
 def save_user(phone_number: str, subscription_level: str, subscription_type: str = 'individual', team_word: str = None):
     db: Session = SessionLocal()
