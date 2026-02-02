@@ -6,7 +6,11 @@ from datetime import datetime, timezone as tz
 from config import DATABASE_URI
 
 Base = declarative_base()
-engine = create_engine(DATABASE_URI)
+engine = create_engine(
+    DATABASE_URI,
+    pool_pre_ping=True,   # проверять соединение перед использованием — избегаем "MySQL server has gone away"
+    pool_recycle=1800,    # переподключаться раз в 30 мин (меньше типичного wait_timeout MySQL)
+)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 

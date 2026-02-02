@@ -40,6 +40,7 @@ export function SubscribeModal({ open, onClose, tariff }: Props) {
   const [type, setType] = useState<'individual' | 'team'>('individual');
   const [phone, setPhone] = useState('');
   const [teamWord, setTeamWord] = useState('');
+  const [email, setEmail] = useState('');
   const [paymentPhase, setPaymentPhase] = useState<'form' | 'loading' | 'iframe' | 'error'>('form');
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -49,6 +50,7 @@ export function SubscribeModal({ open, onClose, tariff }: Props) {
     setType('individual');
     setPhone('');
     setTeamWord('');
+    setEmail('');
     setPaymentPhase('form');
     setPaymentError(null);
     if (containerRef.current) containerRef.current.innerHTML = '';
@@ -116,6 +118,15 @@ export function SubscribeModal({ open, onClose, tariff }: Props) {
         setPaymentError('Введите слово для команды');
         return;
       }
+      const e = email.trim();
+      if (!e) {
+        setPaymentError('Введите email');
+        return;
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) {
+        setPaymentError('Введите корректный email');
+        return;
+      }
     }
 
     setPaymentError(null);
@@ -125,8 +136,12 @@ export function SubscribeModal({ open, onClose, tariff }: Props) {
       subscription_level: level,
       subscription_type: subscriptionType,
     };
-    if (subscriptionType === 'individual') payload.phone_number = phone.trim();
-    else payload.team_word = teamWord.trim();
+    if (subscriptionType === 'individual') {
+      payload.phone_number = phone.trim();
+    } else {
+      payload.team_word = teamWord.trim();
+      payload.email = email.trim();
+    }
 
     try {
       const initRes = await fetch('/api/tbank/init', {
@@ -230,15 +245,26 @@ export function SubscribeModal({ open, onClose, tariff }: Props) {
             )}
 
             {type === 'team' && (
-              <div className="subscribe-form-block">
-                <h4>Слово для команды</h4>
-                <input
-                  type="text"
-                  value={teamWord}
-                  onChange={(e) => setTeamWord(e.target.value)}
-                  placeholder="Слово команды"
-                />
-              </div>
+              <>
+                <div className="subscribe-form-block">
+                  <h4>Слово для команды</h4>
+                  <input
+                    type="text"
+                    value={teamWord}
+                    onChange={(e) => setTeamWord(e.target.value)}
+                    placeholder="Слово команды"
+                  />
+                </div>
+                <div className="subscribe-form-block">
+                  <h4>Email команды</h4>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="example@mail.ru"
+                  />
+                </div>
+              </>
             )}
 
             {paymentError && <p className="subscribe-payment-error">{paymentError}</p>}

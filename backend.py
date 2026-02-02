@@ -93,15 +93,54 @@ def tbank_init():
     else:
         team_word = (data.get("team_word") or "").strip()
         if not team_word:
-            return jsonify({"error": "Team word required"}), 400
+            return jsonify({"error": "Введите слово для команды"}), 400
+        raw_email = (data.get("email") or "").strip()
+        if not raw_email:
+            return jsonify({"error": "Введите email"}), 400
+        if "@" not in raw_email or "." not in raw_email.split("@")[-1]:
+            return jsonify({"error": "Введите корректный email"}), 400
+        receipt_email = raw_email[:64]
         phone_number = None
 
     order_id = generate_order_id()
     description = f"Подписка {subscription_level} ({subscription_type})"
     data_payload = {"Phone": phone_number} if phone_number else None
     notification_url = _tbank_url("/api/tbank/notification")
-    success_url = _tbank_url("/payment/success")
-    fail_url = _tbank_url("/payment/fail")
+
+    # Чек для онлайн-кассы: ФФД 1.05, УСН доходы, одна позиция (Phone или Email обязателен)
+    receipt = None
+    if phone_number:
+        receipt = {
+            "FfdVersion": "1.05",
+            "Phone": "+" + phone_number,
+            "Taxation": "usn_income",
+            "Items": [
+                {
+                    "Name": description[:128],
+                    "Price": amount,
+                    "Quantity": 1,
+                    "Amount": amount,
+                    "Tax": "none",
+                    "PaymentMethod": "full_payment",
+                }
+            ],
+        }
+    else:
+        receipt = {
+            "FfdVersion": "1.05",
+            "Email": receipt_email,
+            "Taxation": "usn_income",
+            "Items": [
+                {
+                    "Name": description[:128],
+                    "Price": amount,
+                    "Quantity": 1,
+                    "Amount": amount,
+                    "Tax": "none",
+                    "PaymentMethod": "full_payment",
+                }
+            ],
+        }
 
     # Сначала вызываем API банка; в БД пишем только при успехе
     try:
@@ -110,9 +149,8 @@ def tbank_init():
             amount=amount,
             description=description,
             notification_url=notification_url,
-            success_url=success_url,
-            fail_url=fail_url,
             data=data_payload,
+            receipt=receipt,
         )
     except Exception as e:
         app.logger.exception("T-Bank Init failed: %s", e)

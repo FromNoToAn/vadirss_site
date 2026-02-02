@@ -41,9 +41,8 @@ def init_payment(
     amount: int,
     description: str,
     notification_url: str | None = None,
-    success_url: str | None = None,
-    fail_url: str | None = None,
     data: dict[str, str] | None = None,
+    receipt: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Инициировать платёж (Init). Возвращает ответ API (Success, PaymentURL, ...)."""
     if not TBANK_TERMINAL_KEY or not TBANK_PASSWORD:
@@ -54,14 +53,12 @@ def init_payment(
         "OrderId": order_id,
         "Description": description,
     }
-    # if notification_url:
-    #     payload["NotificationURL"] = notification_url
-    # if success_url:
-    #     payload["SuccessURL"] = success_url
-    # if fail_url:
-    #     payload["FailURL"] = fail_url
+    if notification_url:
+        payload["NotificationURL"] = notification_url
     if data:
         payload["DATA"] = data
+    if receipt:
+        payload["Receipt"] = receipt
 
     payload["Token"] = _build_token(payload, TBANK_PASSWORD)
 
